@@ -1,0 +1,34 @@
+---
+title: "ST 563 Final Project"
+author: "Jesse DeLaRosa, Grant Swigart, Yang Yue, Jenna Tan"
+date: "June 30, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(boot)
+library(randomForest)
+```
+
+The file?
+
+```{r fileread, include = TRUE}
+ST563Wine <- read.delim("C:/Users/Jesse DeLaRosa/Desktop/Project/Grad School/ST 563 Statistical Learning/Final Project/winequality-red.csv", sep = ";")
+```
+
+THe splits?
+
+```{r filesplit, include = TRUE}
+ST563Wine <- ST563Wine %>% mutate("quality3cat" = factor(ifelse(quality > 0 & quality <=3, "Low",
+                                                                     ifelse(quality > 3 & quality <= 7, "Mid", "High"))))
+
+ST563Wine <- ST563Wine %>% mutate("quality2cat" = factor(ifelse(quality > 0 & quality <= 5, "Low", "High")))
+
+ST563Wine %>% group_by(quality3cat) %>% summarise(count = n())
+ST563Wine %>% group_by(quality2cat) %>% summarize(count = n())
+unique(ST563Wine$quality)
+```
+
+I think it's worth noting that the range of possible scores for wine quality is 1-10, however the data only reflects scores of 3-8
