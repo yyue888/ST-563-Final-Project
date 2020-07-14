@@ -1,0 +1,46 @@
+#Code Quality into Three Catogories: Low, Medium, High
+index = c(3,4,5,6,7,8)
+values = c("Low", "Low", "Medium", "Medium", "High", "High")
+wine$q = values[match(wine$quality, index)]
+#Code Quality into Binomial to fit the Logistic Regression: low=0, high=1
+wine$qbi=ifelse(wine$q=="High", 1, 0)
+
+
+#Linear Regression
+lm.fit = lm(quality ~., data=red_train)
+lm.pred = predict(lm.fit, red_test)
+summary(lm.fit)
+sum(round(lm.pred)!=red_test$quality)/nrow(red_test)
+
+#Logistic Regression
+set.seed(1)
+train.matrix=model.matrix(qbi~,data=red_train)[,-1]
+test.matrix=model.matrix(qbi~,data=red_test)[,-1]
+#Lasso
+cv.fit1 = cv.glmnet(train.matrix, red_train$qbi, alpha=1, family="binomial", type.measure = "class",nfolds=10)
+plot(cv.fit1)
+probs = predict(cv.fit1, s="lambda.min", newx=test.matrix, type="response")
+glm.pred =rep("Low", nrow(red_test))
+glm.pred[probs>0.5]="High"
+table(glm.pred, red_test$qbi)
+mean((glm.pred)!=red_test$qbi)
+
+#LDA
+lda.fit = lda(train.wine$qbi~ ., data=red_train)
+lda.pred = predict(lda.fit, red_test)
+table(lda.class, red_test$qbi)
+mean(lda.class!=red_test$qbi)
+
+#QDA
+qda.fit = qda(train.wine$qbi~ ., data=red_train)
+qda.pred = predict(qda.fit, red_test)
+table(qda.class, red_test$qbi)
+mean(qda.class!=red_test$qbi)
+
+#KNN
+train.x <- scale(red_train[,1:11])
+test.x <- scale(red_test[1:11])
+train.qbi <- red_train[,12]
+for (i in 1:100){
+knn.pred <- knn(train.x, test.x, train.qbi, k=i)
+mean(knn.pred!=red_test$qbi)
