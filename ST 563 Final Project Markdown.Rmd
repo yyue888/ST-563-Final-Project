@@ -53,7 +53,6 @@ write_csv(red_test,"./Test and Training Data/testing.csv")
 ```
 
 ```{r Plots}
-?select
 red_train %>% 
   dplyr::select(c("fixed acidity","volatile acidity","citric acid","pH","quality")) %>%
   ggpairs()
