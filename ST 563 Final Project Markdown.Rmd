@@ -107,15 +107,23 @@ mean(qda.class!=red_test$quality2cat)
 ```
 
 ```{r KNN}
-# Cannot get this to run?
+# Cannot get this to run? Explicitly made train.quality2cat a matrix caused code to run.
 train.x <- scale(red_train[,1:11])
 test.x <- scale(red_test[,1:11])
-train.quality2cat <- red_train[,13]
+train.quality2cat <- as.matrix(red_train[,13])
+knnmisclass = 1
+knnvalue = 0
 
 for (i in 1:100){
 knn.pred <- knn(train.x, test.x, train.quality2cat, k=i)
+check = mean(knn.pred!=red_test$quality2cat)
+if (check < knnmisclass){
+  knnmisclass = check
+  knnvalue = i
+}
 }
 
-mean(knn.pred!=red_test$quality2cat)
+knnmisclass
+knnvalue
 ```
 
