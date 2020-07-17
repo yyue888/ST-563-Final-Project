@@ -7,6 +7,7 @@ output: html_document
 
 ```{r Setup, include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(pastecs)
 library(boot)
 library(randomForest)
 library(caret)
@@ -15,15 +16,28 @@ library(glmnet)
 library(MASS)
 library(class)
 library(tidyverse)
+
 ```
 
 ```{r Fileread, include=FALSE, message=FALSE, warning=FALSE}
 # Jesse's file path: C:/Users/Jesse DeLaRosa/Desktop/Project/Grad School/ST 563 Statistical Learning/Final Project/winequality-red.csv
 # Jenna's working directory: C:/Users/ajtan/Dropbox/2020 Summer/ST 563/Final Project/ST-563-Final-Project
+# Yang's file readin  red <-read.csv(file ="C:/Users/YYUE/Desktop/ST563/Project/winequality-red.csv", header = TRUE, sep = ";")
 
 setwd("C:/Users/ajtan/Dropbox/2020 Summer/ST 563/Final Project/ST-563-Final-Project")
 red<-read_delim("./Wine Data-Original/winequality-red.csv",delim = ';')
 ```
+#Descriptives
+summary(red)
+stat.desc(red)
+
+par(mfrow=c(3,4))
+
+names = names(red)
+for (name in names) {
+hist(red[,name],xlab=name,main=paste("Histogram of",name))
+}
+
 
 ```{r Categorization, include = TRUE}
 # Creating Categorical Variables: quality2cat, quality3cat
