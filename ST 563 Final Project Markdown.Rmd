@@ -126,6 +126,7 @@ if (check < knnmisclass){
 knnmisclass
 knnvalue
 ```
+# LASSO
 
 ```{r lasso, include = TRUE}
 regfit.full = regsubsets(quality ~ ., data = red_train,nvmax=11)
@@ -145,4 +146,19 @@ bestlam = cv.out$lambda.min
 out=glmnet(redpredictors,redoutcome,alpha=1,lamda=grid)
 lass.pred=predict(out,type="response",newx=redpredictorstest, s=bestlam)
 sum(round(lass.pred)!=red_test$quality)/nrow(red_test)
+```
+# Ridge Regression
+
+```{r ridge, include = TRUE}
+redpredictors <- model.matrix(quality~.-quality2cat-quality3cat,red_train)[,-1]
+redpredictorstest <- model.matrix(quality~.-quality2cat-quality3cat,red_test)[,-1]
+redoutcome <- red_train$quality
+grid = 10^seq(10,-2,length=100)
+
+ridge.fit <- glmnet(redpredictors, redoutcome, alpha=0,lambda=grid)
+cv.out <- cv.glmnet(redpredictors,redoutcome,alpha=0)
+bestlam = cv.out$lambda.min
+out=glmnet(redpredictors,redoutcome,alpha=0,lamda=grid)
+ridge.pred=predict(out,type="response",newx=redpredictorstest, s=bestlam)
+sum(round(ridge.pred)!=red_test$quality)/nrow(red_test)
 ```
