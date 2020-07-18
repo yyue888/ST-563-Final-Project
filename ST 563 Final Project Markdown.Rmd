@@ -79,6 +79,18 @@ sum(round(lm.pred)!=red_test$quality)/nrow(red_test)
 set.seed(1)
 train.matrix=model.matrix(quality2cat~.-quality -quality3cat,data=red_train)[,-1]
 test.matrix=model.matrix(quality2cat~.-quality -quality3cat,data=red_test)[,-1]
+
+# Jenna: I'm not sure how to use the model.matrix function, so instead, I subsetted the data to the predictors/response variables we needed to perform the logistic regression
+redcat_train = red_train %>% select(-c(quality,quality3cat))
+redcat_test = red_test %>% select(-c(quality,quality3cat))
+
+log.fit = glm(quality2cat~.,data=redcat_train,family=binomial)
+log.probs = predict(log.fit, newdata=redcat_test, type="response")
+summary(log.fit)
+log.pred = rep("Low",318)
+log.pred[log.probs>0.5]="High"
+table(log.pred,redcat_test$quality2cat)
+sum(log.pred!=redcat_test$quality2cat)/nrow(redcat_test)
 ```
 
 ```{r Lasso}
