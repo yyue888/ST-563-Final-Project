@@ -15,6 +15,7 @@ library(glmnet)
 library(MASS)
 library(class)
 library(tidyverse)
+library(leaps)
 ```
 
 ```{r Fileread, include=FALSE, message=FALSE, warning=FALSE}
