@@ -16,6 +16,7 @@ library(MASS)
 library(class)
 library(tidyverse)
 library(leaps)
+library(tree)
 ```
 
 ```{r Fileread, include=FALSE, message=FALSE, warning=FALSE}
@@ -66,6 +67,7 @@ red_train %>%
   dplyr::select(c("residual sugar","alcohol","density")) %>%
   ggpairs()
 ```
+## Regression Methods
 
 ```{r LinearReg}
 # Be sure to remove the categorical variables from predictors
@@ -74,6 +76,38 @@ lm.pred = predict(lm.fit, red_test)
 summary(lm.fit)
 sum(round(lm.pred)!=red_test$quality)/nrow(red_test)
 ```
+
+# obtain best subset model using cross validation (k=10)
+folds = sample(1:10, nrow(red), replace=TRUE)
+cv.errors = matrix(NA, 10, 11, dimnames=list(NULL, paste(1:11)))
+predict.regsubsets = function(object,newdata,id,...){
+form = as.formula(object$call[[2]])
+mat = model.matrix(form, newdata)
+coefi = coef(object, id=id)
+xvars = names(coefi)
+mat[,xvars]%*%coefi
+}
+for(j in 1:10){
+best.fit = regsubsets(quality~. -quality2cat -quality3cat, data=red[folds!=j,],
+nvmax=11)
+for(i in 1:11){
+pred = predict(best.fit, red[folds==j,], id=i)
+cv.errors[j,i]= mean(red$quality[folds==j]-pred)^2)
+}
+}
+
+mean.cv.errors = apply(cv.errors, 2, mean)
+plot(mean.cv.errors, xlab= "Number of Predictors", ylab = "Mean CV
+Error",col="red",main="Mean Cross Validation Error Rate: Best
+Subset ", type="b")
+
+# Reduce variable to 7
+lm.fit1 = lm(quality ~ volatile.acidity
++chlorides+free.sulfur.dioxide+total.sulfur.dioxide+pH+
+sulphates+alcohol, data=red_train)
+lm.pred1 <- predict(lm.fit1, red_test type="response")
+sum(round(lm.pred1)!=red_test$quality)/nrow(red_test)
+
 
 ```{r LogisticReg}
 set.seed(1)
@@ -170,3 +204,4 @@ out=glmnet(redpredictors,redoutcome,alpha=0,lamda=grid)
 ridge.pred=predict(out,type="response",newx=redpredictorstest, s=bestlam)
 sum(round(ridge.pred)!=red_test$quality)/nrow(red_test)
 ```
+##Classfication Method
